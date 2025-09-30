@@ -66,7 +66,7 @@ def calc_orientation(org: pg.Rect, dst: pg.Rect, current_xy: tuple[float, float]
     dy = dst.centery - org.centery
     distance = math.sqrt(dx**2 + dy**2)
 
-    # 距離が300未満なら、現在の進行方向(慣性)を維持する
+    # 距離が300未満なら、現在の進行方向を維持する
     if distance < 300:
         return current_xy
     
