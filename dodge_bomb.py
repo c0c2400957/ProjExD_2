@@ -3,9 +3,11 @@ import os
 import random
 import sys
 import time
+import math  # mathモジュールを追加
 import pygame as pg
 
 WIDTH, HEIGHT = 1100, 650
+BOMB_BASE_SPEED = 2  # 爆弾の基本速度を定数として定義
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
@@ -64,6 +66,21 @@ def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
     }
     return kk_imgs
 
+# --- ここから追加 ---
+def calc_orientation(org: pg.Rect, dst: pg.Rect) -> tuple[float, float]:
+    """
+    爆弾から見たこうかとんの方向ベクトルを計算する
+    """
+    dx = dst.centerx - org.centerx
+    dy = dst.centery - org.centery
+    distance = math.sqrt(dx**2 + dy**2)
+    if distance == 0:
+        return 0, 0
+    vx = dx / distance * BOMB_BASE_SPEED
+    vy = dy / distance * BOMB_BASE_SPEED
+    return vx, vy
+# --- ここまで追加 ---
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -118,7 +135,8 @@ def main():
         bb_rct.width = bb_img.get_width()
         bb_rct.height = bb_img.get_height()
         acc = bb_accs[idx]
-        bb_rct.move_ip(vx * acc, vy * acc) # 加速を反映
+        vx, vy = calc_orientation(bb_rct, kk_rct)
+        bb_rct.move_ip(vx * acc, vy * acc)
         # --- ここまで変更/追加 ---
 
         yoko, tate = check_bound(bb_rct)
