@@ -1,8 +1,8 @@
-# ステップ1のコード
+# ステップ2のコード
 import os
 import random
 import sys
-import time  # timeモジュールを追加
+import time
 import pygame as pg
 
 WIDTH, HEIGHT = 1100, 650
@@ -16,27 +16,35 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
         tate = False
     return yoko, tate
 
-# --- ここから追加 ---
 def gameover(screen: pg.Surface):
-    """
-    ゲームオーバー画面を表示し、5秒後にゲームを終了する
-    """
+    # (ステップ1から変更なし)
     blackout = pg.Surface((WIDTH, HEIGHT))
     pg.draw.rect(blackout, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
     blackout.set_alpha(200)
     screen.blit(blackout, [0, 0])
-
     font = pg.font.Font(None, 80)
     txt = font.render("Game Over", True, (255, 255, 255))
     txt_rct = txt.get_rect(center=(WIDTH/2, HEIGHT/2))
     screen.blit(txt, txt_rct)
-
     cry_kk_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 2.0)
     cry_kk_rct = cry_kk_img.get_rect(center=(WIDTH/2, HEIGHT/2 + 100))
     screen.blit(cry_kk_img, cry_kk_rct)
-
     pg.display.update()
     time.sleep(5)
+
+# --- ここから追加 ---
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    """
+    拡大率と加速度の異なる爆弾Surfaceリストと加速度リストを生成する
+    """
+    bb_imgs = []
+    bb_accs = [a for a in range(1, 11)]
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)
+    return bb_imgs, bb_accs
 # --- ここまで追加 ---
 
 def main():
@@ -47,9 +55,10 @@ def main():
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
 
-    bb_img = pg.Surface((20, 20))
-    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
-    bb_img.set_colorkey((0, 0, 0))
+    # --- ここから変更 ---
+    bb_imgs, bb_accs = init_bb_imgs() # 爆弾リストを初期化
+    bb_img = bb_imgs[0]
+    # --- ここまで変更 ---
     bb_rct = bb_img.get_rect()
     bb_rct.centerx = random.randint(0, WIDTH)
     bb_rct.centery = random.randint(0, HEIGHT)
@@ -63,11 +72,9 @@ def main():
                 return
         screen.blit(bg_img, [0, 0]) 
 
-        # --- ここから変更 ---
         if kk_rct.colliderect(bb_rct):
-            gameover(screen)  # ゲームオーバー関数を呼び出す
+            gameover(screen)
             return
-        # --- ここまで変更 ---
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
@@ -85,7 +92,15 @@ def main():
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)
 
-        bb_rct.move_ip(vx, vy)
+        # --- ここから変更/追加 ---
+        idx = min(tmr // 500, 9)
+        bb_img = bb_imgs[idx]
+        bb_rct.width = bb_img.get_width()
+        bb_rct.height = bb_img.get_height()
+        acc = bb_accs[idx]
+        bb_rct.move_ip(vx * acc, vy * acc) # 加速を反映
+        # --- ここまで変更/追加 ---
+
         yoko, tate = check_bound(bb_rct)
         if not yoko:
             vx *= -1
