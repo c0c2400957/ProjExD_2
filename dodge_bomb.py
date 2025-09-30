@@ -43,6 +43,7 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
         bb_imgs.append(bb_img)
     return bb_imgs, bb_accs
 
+#Issue#3の修正
 def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
     kk_base_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     orientations = {
@@ -55,7 +56,7 @@ def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
         img = pg.transform.flip(kk_base_img, flip, False)
         kk_imgs[move] = pg.transform.rotozoom(img, angle, 1.0)
     return kk_imgs
-
+#ここまでISSUEの修正
 # --- ここから関数定義を修正 ---
 def calc_orientation(org: pg.Rect, dst: pg.Rect, current_xy: tuple[float, float]) -> tuple[float, float]:
     """
