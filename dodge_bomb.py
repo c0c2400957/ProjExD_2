@@ -18,7 +18,7 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
         tate = False
     return yoko, tate
 
-def gameover(screen: pg.Surface):
+def gameover(screen: pg.Surface) -> None:
     # (ステップ1から変更なし)
     blackout = pg.Surface((WIDTH, HEIGHT))
     pg.draw.rect(blackout, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
@@ -81,7 +81,7 @@ def calc_orientation(org: pg.Rect, dst: pg.Rect) -> tuple[float, float]:
     return vx, vy
 # --- ここまで追加 ---
 
-def main():
+def main() -> None:
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
@@ -139,15 +139,15 @@ def main():
         bb_rct.move_ip(vx * acc, vy * acc)
         # --- ここまで変更/追加 ---
 
-        yoko, tate = check_bound(bb_rct)
-        if not yoko:
-            vx *= -1
-        if not tate:
-            vy *= -1
-        screen.blit(bb_img, bb_rct)
-        pg.display.update()
-        tmr += 1
-        clock.tick(50)
+        #yoko, tate = check_bound(bb_rct)
+        #if not yoko:
+        #    vx *= -1
+        #if not tate:
+        #    vy *= -1
+        #screen.blit(bb_img, bb_rct)
+        #pg.display.update()
+        #tmr += 1
+        #clock.tick(50)
 
 if __name__ == "__main__":
     pg.init()
