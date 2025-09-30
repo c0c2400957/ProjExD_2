@@ -46,12 +46,30 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
         bb_imgs.append(bb_img)
     return bb_imgs, bb_accs
 # --- ここまで追加 ---
+def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
+    """
+    移動量タプルに対応するこうかとんSurfaceを値とした辞書を返す
+    """
+    kk_base_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_imgs = {
+        (0, 0): kk_base_img,
+        (0, -5): pg.transform.rotozoom(pg.transform.flip(kk_base_img, True, False), 90, 1.0),
+        (5, -5): pg.transform.rotozoom(pg.transform.flip(kk_base_img, True, False), 45, 1.0),
+        (5, 0): pg.transform.flip(kk_base_img, True, False),
+        (5, 5): pg.transform.rotozoom(pg.transform.flip(kk_base_img, True, False), -45, 1.0),
+        (0, 5): pg.transform.rotozoom(pg.transform.flip(kk_base_img, True, False), -90, 1.0),
+        (-5, 5): pg.transform.rotozoom(kk_base_img, -45, 1.0),
+        (-5, 0): kk_base_img,
+        (-5, -5): pg.transform.rotozoom(kk_base_img, 45, 1.0),
+    }
+    return kk_imgs
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
-    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_imgs = get_kk_imgs() # こうかとん画像辞書を初期化
+    kk_img = kk_imgs[(0, 0)]
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
 
@@ -86,6 +104,8 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += mv[0]
                 sum_mv[1] += mv[1]
+        
+        kk_img = kk_imgs[tuple(sum_mv)] if tuple(sum_mv) in kk_imgs else kk_imgs[(0, 0)]
 
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True, True):
