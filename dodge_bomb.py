@@ -45,17 +45,15 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
 
 def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
     kk_base_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
-    kk_imgs = {
-        (0, 0): kk_base_img,
-        (0, -5): pg.transform.rotozoom(pg.transform.flip(kk_base_img, True, False), 90, 1.0),
-        (5, -5): pg.transform.rotozoom(pg.transform.flip(kk_base_img, True, False), 45, 1.0),
-        (5, 0): pg.transform.flip(kk_base_img, True, False),
-        (5, 5): pg.transform.rotozoom(pg.transform.flip(kk_base_img, True, False), -45, 1.0),
-        (0, 5): pg.transform.rotozoom(pg.transform.flip(kk_base_img, True, False), -90, 1.0),
-        (-5, 5): pg.transform.rotozoom(kk_base_img, -45, 1.0),
-        (-5, 0): kk_base_img,
-        (-5, -5): pg.transform.rotozoom(kk_base_img, 45, 1.0),
+    orientations = {
+        (0, -5): (90, True), (5, -5): (45, True), (5, 0): (0, True),
+        (5, 5): (-45, True), (0, 5): (-90, True), (-5, 5): (-45, False),
+        (-5, 0): (0, False), (-5, -5): (45, False)
     }
+    kk_imgs = {(0, 0): kk_base_img}
+    for move, (angle, flip) in orientations.items():
+        img = pg.transform.flip(kk_base_img, flip, False)
+        kk_imgs[move] = pg.transform.rotozoom(img, angle, 1.0)
     return kk_imgs
 
 # --- ここから関数定義を修正 ---
